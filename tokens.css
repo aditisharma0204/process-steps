@@ -1,0 +1,31 @@
+/* ============================================================ */
+/* Process Steps — Design Tokens                                 */
+/* ------------------------------------------------------------ */
+/* Only the tokens actually referenced by process-steps.css      */
+/* live here. If your prototype already defines these variables, */
+/* you can skip this file (or merge the values into your own     */
+/* tokens). Override any of them at :root to rebrand.            */
+/* ============================================================ */
+:root {
+  /* Brand primary. Drives the settled "check" glyph color.
+     Originally `--color-primary` / `--slds-blue-50` in the source
+     prototype — kept as an alias so the animation CSS reads naturally. */
+  --color-primary: #066AFE;
+  --slds-blue-50: var(--color-primary);
+
+  /* Base typeface for the row text. Salesforce Sans first; falls back
+     to system UI fonts so it still feels right on machines without
+     the brand font installed. */
+  --font-family-base: "Salesforce Sans", "SalesforceSans", -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+
+  /* Shiny-text gradient stops.
+       --shiny-base : the muted text color when the row is at rest.
+       --shiny-shine: the bright highlight that sweeps across the text
+                      during the `working` phase (see @keyframes
+                      shiny-sweep in process-steps.css).
+     Tweak these to retune the shimmer intensity / vibe. */
+  --shiny-base: rgba(0, 30, 91, 0.55);
+  --shiny-shine: rgba(255, 255, 255, 0.95);
+}

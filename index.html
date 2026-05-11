@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Process Steps — Standalone Demo</title>
+
+    <!-- Tokens first (so anything below can reference them),
+         then the animation styles. Order matters. -->
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="process-steps.css" />
+
+    <style>
+      /* Minimal demo chrome. Everything here is *demo only* — none of
+         it is required to use the animation in another prototype. */
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: var(--font-family-base);
+        color: var(--color-on-surface-1, #001E5B);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Soft tinted backdrop borrowed from the source prototype's
+         "creating" view so the shimmer reads correctly. Swap this
+         for your own canvas when integrating. */
+      .demo-canvas {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #EDF4FF;
+        overflow: hidden;
+      }
+
+      /* The animation root. ProcessSteps.mount(root) writes into this. */
+      #process-steps-root {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* Tiny control bar in the top-left. Replace / remove as you like. */
+      .demo-controls {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 10;
+        display: inline-flex;
+        gap: 8px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: 1px solid rgba(0, 30, 91, 0.08);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 30, 91, 0.06);
+      }
+      .demo-controls button {
+        appearance: none;
+        border: 0;
+        background: var(--color-primary);
+        color: #fff;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 590;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .demo-controls button.secondary {
+        background: transparent;
+        color: var(--color-primary);
+        border: 1px solid currentColor;
+      }
+      .demo-controls button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-canvas">
+      <div class="demo-controls" role="toolbar" aria-label="Demo controls">
+        <button id="play-btn" type="button">Play</button>
+        <button id="replay-btn" class="secondary" type="button">Replay</button>
+      </div>
+
+      <!-- One root div. ProcessSteps.mount() injects the markup. -->
+      <div id="process-steps-root"></div>
+    </div>
+
+    <script src="process-steps.js"></script>
+    <script>
+      (function () {
+        const root = document.getElementById("process-steps-root");
+        const playBtn = document.getElementById("play-btn");
+        const replayBtn = document.getElementById("replay-btn");
+
+        const controller = window.ProcessSteps.mount(root, {
+          // Override any of these. Omit to use the defaults baked in.
+          // lines: ["…", "…", "…"],
+          // sparkleSrc: "assets/sparkle-sf.png",
+        });
+
+        controller.onComplete(() => {
+          playBtn.textContent = "Play";
+          playBtn.disabled = false;
+        });
+
+        function start() {
+          controller.restart();
+          playBtn.textContent = "Playing…";
+          playBtn.disabled = true;
+        }
+
+        playBtn.addEventListener("click", start);
+        replayBtn.addEventListener("click", start);
+
+        // Auto-play on load so the demo opens "live".
+        start();
+      })();
+    </script>
+  </body>
+</html>

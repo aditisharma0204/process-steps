@@ -1,0 +1,121 @@
+/* ============================================================ */
+/* Process Steps — Animation Styles                              */
+/* ------------------------------------------------------------ */
+/* One row at a time (with a brief cross-fade overlap between    */
+/* adjacent steps), Cursor-style "thinking log". Each step       */
+/* cycles enter → working (shimmer) → settle (sparkle→check pop) */
+/* → exit. Per-row opacity, translateY, scale and glyph state    */
+/* are written from JS each frame so scrubbing works in both     */
+/* directions — including the overlap window where two rows are  */
+/* simultaneously visible. The shiny-text sweep is the only      */
+/* CSS-driven animation (decorative, stateless — toggled on/off  */
+/* via .is-shimmer derived from t).                              */
+/* ============================================================ */
+
+/* Outer overlay. Positions the stage in the center of whatever
+   container it lives inside. Self-contained: no `.view-creating`
+   parent state required. */
+.exp-process-steps-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 32px;
+}
+
+/* Stage = a fixed slot all rows share. Rows are absolutely stacked
+   on top of each other; the active step (and, briefly, its neighbor
+   during the overlap window) is the only one visible. */
+.exp-process-stage {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 660px;
+  height: 42px;
+  font-family: var(--font-family-base);
+}
+
+.exp-process-row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 30px;
+  line-height: 42px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--shiny-base);
+  white-space: nowrap;
+  /* Initial state — JS overrides via inline opacity/transform. */
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+  transform-origin: center center;
+  /* No CSS transitions: state is a pure function of timeline `t`. */
+}
+
+.exp-process-glyph {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exp-process-sparkle,
+.exp-process-check {
+  position: absolute;
+  inset: 0;
+  width: 26px;
+  height: 26px;
+  /* Inline opacity/transform are set per-frame from t; no CSS
+     transitions here either. */
+}
+
+.exp-process-sparkle {
+  /* PNG carries its own brand gradient (blue → purple → pink), so no
+     color is set here. Soft neutral halo lets the multi-color glyph
+     read on the light backdrop without competing with its own hues. */
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px rgba(80, 60, 200, 0.22));
+}
+
+.exp-process-check {
+  color: var(--slds-blue-50);
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+/* Shiny-text shimmer — applied to the active row's text during the
+   "working" phase only. Slightly slower sweep (2.8s) reads more
+   "ongoing thought" than "looping animation". The sweep itself is
+   purely decorative and state-free, so an infinite CSS animation
+   is safe under scrubbing. */
+.exp-process-row.is-shimmer .exp-process-text {
+  background-image: linear-gradient(
+    120deg,
+    var(--shiny-base) 0%,
+    var(--shiny-base) 35%,
+    var(--shiny-shine) 50%,
+    var(--shiny-base) 65%,
+    var(--shiny-base) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shiny-sweep 2.8s linear infinite;
+}
+
+@keyframes shiny-sweep {
+  0%   { background-position: 150% center; }
+  100% { background-position: -50% center; }
+}

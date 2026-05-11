@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (even though we have no deps — future-proofing)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# OS / misc
+Thumbs.db
+ehthumbs.db
+*.log
