@@ -16,7 +16,7 @@ prototype that has a `<div>` and a stylesheet.
 
 ## Live demo
 
-Hosted demo: _TBD — fill in after deploying this repo to GitHub Pages._
+Hosted demo: **https://aditisharma0204.github.io/process-steps/**
 
 ## Quick start (run the demo locally)
 
