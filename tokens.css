@@ -1,31 +1,81 @@
 /* ============================================================ */
-/* Process Steps — Design Tokens                                 */
+/* Process Steps + Hero — Design Tokens                          */
 /* ------------------------------------------------------------ */
-/* Only the tokens actually referenced by process-steps.css      */
-/* live here. If your prototype already defines these variables, */
-/* you can skip this file (or merge the values into your own     */
-/* tokens). Override any of them at :root to rebrand.            */
+/* This file carries every CSS custom property referenced by the */
+/* animation (`process-steps.css`) AND the optional landing      */
+/* hero block (`hero.css`). If your prototype already defines    */
+/* the same variables, you can skip this file (or merge values   */
+/* into your own tokens). Override any of them at :root to       */
+/* rebrand without touching the rest of the codebase.            */
 /* ============================================================ */
 :root {
-  /* Brand primary. Drives the settled "check" glyph color.
-     Originally `--color-primary` / `--slds-blue-50` in the source
-     prototype — kept as an alias so the animation CSS reads naturally. */
+  /* ---------------------------------------------------------- */
+  /* Brand primary.                                              */
+  /* Drives the settled "check" glyph color in the animation     */
+  /* AND the Get Started button background on the hero. Aliased  */
+  /* as `--slds-blue-50` for legacy CSS that pre-dates the brand  */
+  /* refresh — both names point at the same value, and you can   */
+  /* override either to recolor the brand surfaces.              */
+  /* ---------------------------------------------------------- */
   --color-primary: #066AFE;
+  --color-primary-hover: #0250D9;
   --slds-blue-50: var(--color-primary);
 
-  /* Base typeface for the row text. Salesforce Sans first; falls back
-     to system UI fonts so it still feels right on machines without
-     the brand font installed. */
+  /* ---------------------------------------------------------- */
+  /* Base typeface.                                              */
+  /* Salesforce Sans first; falls back to system UI fonts so it  */
+  /* still feels right on machines without the brand font.       */
+  /* ---------------------------------------------------------- */
   --font-family-base: "Salesforce Sans", "SalesforceSans", -apple-system,
     BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
 
-  /* Shiny-text gradient stops.
-       --shiny-base : the muted text color when the row is at rest.
-       --shiny-shine: the bright highlight that sweeps across the text
-                      during the `working` phase (see @keyframes
-                      shiny-sweep in process-steps.css).
-     Tweak these to retune the shimmer intensity / vibe. */
+  /* ---------------------------------------------------------- */
+  /* Shiny-text gradient stops — process-steps shimmer sweep.    */
+  /*   --shiny-base : the muted text color when the row is at    */
+  /*                  rest.                                       */
+  /*   --shiny-shine: the bright highlight that sweeps across    */
+  /*                  the text during the `working` phase. See    */
+  /*                  @keyframes shiny-sweep in process-steps.css */
+  /*                  to retune the sweep speed.                  */
+  /* ---------------------------------------------------------- */
   --shiny-base: rgba(0, 30, 91, 0.55);
   --shiny-shine: rgba(255, 255, 255, 0.95);
+
+  /* ---------------------------------------------------------- */
+  /* Hero block tokens — only used by hero.css.                  */
+  /* Skip / delete this whole block if you only want the         */
+  /* animation. The values below are lifted from the parent      */
+  /* prototype's brand tokens (`.planning/brand/tokens.json`).   */
+  /* ---------------------------------------------------------- */
+
+  /* Hero text colors. */
+  --color-on-surface: #001E5B;
+  --color-on-surface-strong: #03234D;
+
+  /* Surfaces & borders for the preview card. */
+  --color-surface-card: #FFFFFF;
+  --color-border-subtle: #F3F3F3;
+  --color-border: #E5E5E5;
+  --color-blue-90: #D6E6FF;
+
+  /* Pill-button radius (matches SLDS `--slds-g-radius-border-circle`). */
+  --radius-full: 999px;
+
+  /* Get Started button drop shadow (subtle "lifted" feel). */
+  --shadow-btn-rest: 0 1px 2px rgba(2, 80, 217, 0.30);
+  --shadow-btn-hover: 0 4px 12px rgba(2, 80, 217, 0.35);
+
+  /* ---------------------------------------------------------- */
+  /* Hero backdrop — soft purple→blue gradient + 3 radial glows. */
+  /* These three glow stops are what make the canvas feel        */
+  /* "branded" rather than flat. Tweak the alpha on `.glow` in   */
+  /* hero.css to dial intensity up/down.                          */
+  /* ---------------------------------------------------------- */
+  --hero-bg-start: #EDF4FF;
+  --hero-bg-mid:   #E8ECFF;
+  --hero-bg-end:   #F6F2FB;
+  --hero-glow-cyan:   #1AB9FF;
+  --hero-glow-violet: #E5B9FE;
+  --hero-glow-blue:   #066AFE;
 }

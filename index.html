@@ -5,120 +5,206 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Process Steps — Standalone Demo</title>
 
-    <!-- Tokens first (so anything below can reference them),
-         then the animation styles. Order matters. -->
-    <link rel="stylesheet" href="tokens.css" />
-    <link rel="stylesheet" href="process-steps.css" />
+    <!-- Tokens first (so anything below can reference them).
+         Then the optional hero block, then the animation. The
+         only mandatory pair to use the animation in another
+         prototype is `tokens.css` + `process-steps.css`; `hero.css`
+         is only needed if you also want to lift the landing block. -->
+    <link rel="stylesheet" href="tokens.css?v=2" />
+    <link rel="stylesheet" href="hero.css?v=2" />
+    <link rel="stylesheet" href="process-steps.css?v=2" />
 
     <style>
-      /* Minimal demo chrome. Everything here is *demo only* — none of
-         it is required to use the animation in another prototype. */
+      /* Page reset / chrome. Demo-only — not required to use either
+         the hero or the animation in another prototype. */
       html, body {
         margin: 0;
         padding: 0;
         height: 100%;
         font-family: var(--font-family-base);
-        color: var(--color-on-surface-1, #001E5B);
+        color: var(--color-on-surface, #001E5B);
+        background: var(--hero-bg-start, #EDF4FF);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-      }
-
-      /* Soft tinted backdrop borrowed from the source prototype's
-         "creating" view so the shimmer reads correctly. Swap this
-         for your own canvas when integrating. */
-      .demo-canvas {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        background: #EDF4FF;
-        overflow: hidden;
-      }
-
-      /* The animation root. ProcessSteps.mount(root) writes into this. */
-      #process-steps-root {
-        position: absolute;
-        inset: 0;
-      }
-
-      /* Tiny control bar in the top-left. Replace / remove as you like. */
-      .demo-controls {
-        position: absolute;
-        top: 16px;
-        left: 16px;
-        z-index: 10;
-        display: inline-flex;
-        gap: 8px;
-        padding: 8px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        border: 1px solid rgba(0, 30, 91, 0.08);
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 30, 91, 0.06);
-      }
-      .demo-controls button {
-        appearance: none;
-        border: 0;
-        background: var(--color-primary);
-        color: #fff;
-        font: inherit;
-        font-size: 13px;
-        font-weight: 590;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      .demo-controls button.secondary {
-        background: transparent;
-        color: var(--color-primary);
-        border: 1px solid currentColor;
-      }
-      .demo-controls button:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
       }
     </style>
   </head>
   <body>
-    <div class="demo-canvas">
-      <div class="demo-controls" role="toolbar" aria-label="Demo controls">
-        <button id="play-btn" type="button">Play</button>
-        <button id="replay-btn" class="secondary" type="button">Replay</button>
-      </div>
+    <!-- ============================================================ -->
+    <!-- VIEW 1 — Landing hero.                                        -->
+    <!-- Centered hero on a soft gradient backdrop. On Get Started    -->
+    <!-- click, .hero gets `.is-leaving` and lifts up 10% + fades to  -->
+    <!-- 0 over 480ms (uniform single-block exit; no per-child       -->
+    <!-- stagger). After 500ms we hide this view and show the         -->
+    <!-- animation view.                                               -->
+    <!-- ============================================================ -->
+    <div class="view view-landing is-active" id="view-landing">
+      <div class="hero-stage">
+        <div class="page-bg" aria-hidden="true">
+          <div class="glow glow-1"></div>
+          <div class="glow glow-2"></div>
+          <div class="glow glow-3"></div>
+        </div>
 
-      <!-- One root div. ProcessSteps.mount() injects the markup. -->
-      <div id="process-steps-root"></div>
+        <section class="hero" id="hero">
+          <!-- Stylized Salesforce-ish search-result mock. Pure CSS,
+               no real data — just a visual anchor that hints at
+               what Process Steps will eventually produce. -->
+          <div class="preview-card" aria-hidden="true">
+            <div class="preview-chrome">
+              <span class="chrome-line"></span>
+              <span class="chrome-line"></span>
+              <span class="chrome-line"></span>
+              <span class="chrome-line"></span>
+              <span class="chrome-pill"></span>
+            </div>
+            <div class="preview-body">
+              <div class="preview-card-inner">
+                <span class="preview-line line-md"></span>
+                <span class="preview-line line-sm"></span>
+                <div class="preview-search">
+                  <div class="preview-search-pill">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="10" cy="10" r="6" stroke="#9F7CFF" stroke-width="2" fill="none"/>
+                      <path d="m15 15 4 4" stroke="#9F7CFF" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M16 5l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="#9F7CFF"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="preview-metrics">
+                  <span class="metric"></span>
+                  <span class="metric"></span>
+                  <span class="metric"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h1 class="hero-title">Create an agentic self-service experience</h1>
+          <p class="hero-subtitle">
+            Deflect cases and provide 24/7 customer support. Customize your AI agent,
+            then add it to your communication channels.
+          </p>
+          <button class="btn-brand" type="button" id="btn-get-started">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Zm6 10 .9 2.6L21 16l-2.1.4L18 19l-.9-2.6L15 16l2.1-.4L18 13Z"/>
+            </svg>
+            Get Started
+          </button>
+        </section>
+      </div>
     </div>
 
-    <script src="process-steps.js"></script>
+    <!-- ============================================================ -->
+    <!-- VIEW 2 — Process Steps animation canvas.                     -->
+    <!-- Same soft gradient backdrop as landing so the swap feels     -->
+    <!-- like one continuous surface. ProcessSteps.mount() injects    -->
+    <!-- the rows into #process-steps-root.                            -->
+    <!-- ============================================================ -->
+    <div class="view view-animation" id="view-animation" aria-hidden="true">
+      <div id="process-steps-root"></div>
+
+      <button class="replay-btn" id="replay-btn" type="button" aria-label="Restart demo">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5V2L7 6l5 4V7c3.31 0 6 2.69 6 6 0 1.66-.67 3.16-1.76 4.24l1.42 1.42A7.96 7.96 0 0 0 20 13c0-4.42-3.58-8-8-8Zm-6 8c0-1.66.67-3.16 1.76-4.24L6.34 7.34A7.96 7.96 0 0 0 4 13c0 4.42 3.58 8 8 8v3l5-4-5-4v3c-3.31 0-6-2.69-6-6Z"/>
+        </svg>
+        Replay
+      </button>
+    </div>
+
+    <script src="process-steps.js?v=2"></script>
     <script>
+      /* ============================================================ */
+      /* Demo controller — landing → exit → animation → done.          */
+      /* ------------------------------------------------------------ */
+      /* 10 lines of glue. No state machine, no router. Just:          */
+      /*   1) On Get Started click, add `.is-leaving` to .hero,        */
+      /*      wait HERO_EXIT_WAIT (matches the 480ms CSS transition    */
+      /*      with a 20ms safety margin), swap views, then mount the   */
+      /*      animation on the next tick so Step 1's enhanced 340ms    */
+      /*      entrance overlaps with the view's appearance.            */
+      /*   2) When Process Steps signals onComplete, fade in the       */
+      /*      bottom-center Replay button.                             */
+      /*   3) Replay click → swap back to landing, remove .is-leaving, */
+      /*      destroy the animation (so the next mount is fresh), and  */
+      /*      re-arm the Get Started button.                           */
+      /* ============================================================ */
       (function () {
-        const root = document.getElementById("process-steps-root");
-        const playBtn = document.getElementById("play-btn");
-        const replayBtn = document.getElementById("replay-btn");
+        // Hero exit timing. Kept in sync with .hero / .hero.is-leaving
+        // in hero.css (480ms). We wait a hair longer than the CSS
+        // transition so the rise + fade fully completes before the
+        // view swaps.
+        const HERO_EXIT_WAIT = 500;
 
-        const controller = window.ProcessSteps.mount(root, {
-          // Override any of these. Omit to use the defaults baked in.
-          // lines: ["…", "…", "…"],
-          // sparkleSrc: "assets/sparkle-sf.png",
-        });
+        const $landing  = document.getElementById("view-landing");
+        const $anim     = document.getElementById("view-animation");
+        const $hero     = document.getElementById("hero");
+        const $start    = document.getElementById("btn-get-started");
+        const $replay   = document.getElementById("replay-btn");
+        const $animRoot = document.getElementById("process-steps-root");
 
-        controller.onComplete(() => {
-          playBtn.textContent = "Play";
-          playBtn.disabled = false;
-        });
+        let controller = null;
 
-        function start() {
-          controller.restart();
-          playBtn.textContent = "Playing…";
-          playBtn.disabled = true;
+        function showView(which) {
+          $landing.classList.toggle("is-active", which === "landing");
+          $anim.classList.toggle("is-active",    which === "animation");
+          $landing.setAttribute("aria-hidden", which === "landing"   ? "false" : "true");
+          $anim.setAttribute("aria-hidden",    which === "animation" ? "false" : "true");
         }
 
-        playBtn.addEventListener("click", start);
-        replayBtn.addEventListener("click", start);
+        function wait(ms) {
+          return new Promise((r) => setTimeout(r, ms));
+        }
 
-        // Auto-play on load so the demo opens "live".
-        start();
+        async function startDemo() {
+          if ($hero.classList.contains("is-leaving")) return; // mid-exit guard
+          $start.disabled = true;
+          // Move focus off the button before we mark the landing view
+          // aria-hidden during the exit — otherwise browsers (correctly)
+          // warn that focus is trapped inside an aria-hidden subtree.
+          $start.blur();
+          $hero.classList.add("is-leaving");
+
+          await wait(HERO_EXIT_WAIT);
+
+          showView("animation");
+
+          // Mount on the next tick so Step 1's 340ms entrance lands
+          // right as the animation view appears — feels like one
+          // continuous motion. Re-mount each run for a clean DOM.
+          if (controller) {
+            try { controller.destroy(); } catch (_) {}
+            controller = null;
+          }
+          setTimeout(() => {
+            controller = window.ProcessSteps.mount($animRoot, {
+              // lines: ["…", "…", "…"],
+              // sparkleSrc: "assets/sparkle-sf.png",
+            });
+            controller.onComplete(() => {
+              $replay.classList.add("is-visible");
+            });
+            controller.play();
+          }, 0);
+        }
+
+        function resetDemo() {
+          // Same focus-before-aria-hidden fix as startDemo. The Replay
+          // button retains focus by default after a click; we move focus
+          // off it before the animation view goes aria-hidden.
+          $replay.blur();
+          $replay.classList.remove("is-visible");
+          if (controller) {
+            try { controller.destroy(); } catch (_) {}
+            controller = null;
+          }
+          showView("landing");
+          $hero.classList.remove("is-leaving");
+          $start.disabled = false;
+        }
+
+        $start.addEventListener("click", startDemo);
+        $replay.addEventListener("click", resetDemo);
       })();
     </script>
   </body>

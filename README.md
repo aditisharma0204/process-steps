@@ -11,25 +11,46 @@ exiting and handing the slot to the next line.
    ✨ Connecting your channels           ← enters, shimmers, ✨ → ✔, ends
 ```
 
-No dependencies. No build step. ~14KB of CSS + JS + one PNG. Drop into any
-prototype that has a `<div>` and a stylesheet.
+This repo ships **two pieces** you can lift independently:
+
+- **The animation** (`process-steps.{css,js}` + `tokens.css` + the sparkle PNG) —
+  ~14KB of vanilla CSS + JS, no deps, no build step. Drop into any prototype
+  that has a `<div>` and a stylesheet.
+- **The hero block** that the animation transitions out of (`hero.css` + the
+  matching markup in `index.html`). The landing's preview-card + title +
+  subtitle + Get Started button, plus the uniform 480ms hero exit (lift 10% +
+  fade out) that runs before the animation begins. Optional — only useful if
+  you want the same "branded landing → process steps" choreography as the
+  parent prototype.
+
+The standalone `index.html` wires both together so you can see the full flow:
+**hero on a soft branded backdrop → click Get Started → 480ms hero exit →
+view swap → process steps animation (8.24s) → bottom-center Replay button**.
 
 ## Live demo
 
-Hosted demo: **https://aditisharma0204.github.io/process-steps/**
+Hosted demo: <https://aditisharma0204.github.io/process-steps/>
 
 ## Quick start (run the demo locally)
 
 ```bash
 # from inside this repo
 python3 -m http.server 8000
-# then open http://localhost:8000 — the animation auto-plays on load.
+# then open http://localhost:8000 — page loads on the hero, click
+# Get Started to play the full flow. Replay button appears bottom-
+# center after the animation completes.
 ```
 
 Any static server works (`npx serve`, `caddy file-server`, etc.). There is no
 build step.
 
-## Integration into another prototype
+## Integration — two paths
+
+### Path A — Lift just the animation
+
+Use this when you want the Cursor-style thinking-log animation inside an
+existing screen of your prototype (so the surrounding chrome, hero, navigation,
+etc. stays as you've already built it).
 
 1.  **Copy four things** into your prototype:
 
@@ -89,6 +110,72 @@ build step.
 That's it. The animation works on a blank `<div>` placed anywhere on the page;
 no parent state machine or `data-` attributes are required.
 
+### Path B — Lift the hero **and** the animation
+
+Use this when you want the same landing → exit → process-steps choreography
+the parent prototype ships: a centered hero block (preview card + title +
+subtitle + Get Started button) on a soft purple→blue backdrop, a uniform
+480ms hero exit (lift 10% + fade), and a clean view swap into the animation.
+
+1.  **Copy seven things** into your prototype:
+
+    ```
+    process-steps.css
+    process-steps.js
+    hero.css
+    tokens.css                ← required for both pieces; carries hero-
+                                related vars too (button bg, gradient
+                                stops, etc.)
+    assets/sparkle-sf.png
+    ```
+
+    Plus the hero markup + the ~30-line click-handler glue from
+    `index.html` (search for `<!-- VIEW 1 — Landing hero -->` and the
+    `(function ()` IIFE at the bottom of the file).
+
+2.  **Link the styles** in your HTML — order matters:
+
+    ```html
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="hero.css" />
+    <link rel="stylesheet" href="process-steps.css" />
+    <script src="process-steps.js" defer></script>
+    ```
+
+3.  **Match the hero exit timing in JS to the CSS transition.** The hero
+    transitions over `480ms`; the click handler waits `500ms` before
+    swapping views. If you tweak one, tweak the other:
+
+    ```js
+    // hero.css
+    .hero { transition: transform 480ms cubic-bezier(0.32, 0.72, 0, 1),
+                        opacity   480ms cubic-bezier(0.32, 0.72, 0, 1); }
+    .hero.is-leaving { transform: translateY(-10%); opacity: 0; }
+
+    // index.html click handler
+    const HERO_EXIT_WAIT = 500;          // 480ms transition + 20ms safety
+    hero.classList.add("is-leaving");
+    await wait(HERO_EXIT_WAIT);
+    showView("animation");
+    setTimeout(() => ProcessSteps.mount(root).play(), 0);
+    ```
+
+    **Do NOT add per-child stagger to the hero exit.** The whole hero block
+    is meant to lift and fade as one beat — the parent prototype explicitly
+    reverted a staggered version because it pulled focus off the title
+    during the transition.
+
+4.  **Centering the hero.** `.hero` is `position: absolute; inset: 0` with
+    flex centering, so it fills its nearest positioned ancestor. In the
+    standalone demo, that ancestor is `.hero-stage` (full viewport). In
+    your prototype, wrap the hero in a sized container and the hero will
+    center inside it.
+
+That's the whole recipe. Total clock time from page load → Step 1 visible
+once Get Started is clicked is **~700ms** (480ms hero exit + ~20ms view
+swap + Step 1's 340ms entrance, with 340ms of overlap between the swap
+and the entrance).
+
 ### Controller API
 
 | Method               | What it does                                                                 |
@@ -145,8 +232,10 @@ contemplative.
 
 ## Brand tokens
 
-`tokens.css` defines four CSS custom properties. Override them at `:root` (or
-on an ancestor of the animation) to rebrand without touching this repo's code.
+`tokens.css` defines two groups of CSS custom properties. Override them at
+`:root` (or on an ancestor) to rebrand without touching this repo's code.
+
+**Animation tokens** (used by `process-steps.css`):
 
 | Token                | Default                          | What it controls                                                                       |
 | -------------------- | -------------------------------- | -------------------------------------------------------------------------------------- |
@@ -154,6 +243,20 @@ on an ancestor of the animation) to rebrand without touching this repo's code.
 | `--font-family-base` | Salesforce Sans + system stack   | Row text typeface.                                                                     |
 | `--shiny-base`       | `rgba(0, 30, 91, 0.55)`          | Muted text color when the row is at rest (and the gradient stops).                     |
 | `--shiny-shine`      | `rgba(255, 255, 255, 0.95)`      | The bright highlight that sweeps across the text during the working phase.             |
+
+**Hero tokens** (used by `hero.css` — only relevant for Path B):
+
+| Token                       | Default     | What it controls                                                       |
+| --------------------------- | ----------- | ---------------------------------------------------------------------- |
+| `--color-primary-hover`     | `#0250D9`   | Get Started button hover background.                                   |
+| `--color-on-surface`        | `#001E5B`   | Hero title + subtitle text color.                                      |
+| `--color-surface-card`      | `#FFFFFF`   | Preview card background.                                               |
+| `--color-border`            | `#E5E5E5`   | Preview chrome line color.                                             |
+| `--color-border-subtle`     | `#F3F3F3`   | Preview card / inner-card hairlines.                                   |
+| `--color-blue-90`           | `#D6E6FF`   | Faux content lines + metric chips inside the preview card.             |
+| `--radius-full`             | `999px`     | Get Started button (pill) radius.                                      |
+| `--hero-bg-start/mid/end`   | soft tints  | The 3-stop landing gradient (purple→blue).                              |
+| `--hero-glow-cyan/violet/blue` | brand stops | The 3 radial glows behind the hero. Tweak `.glow { opacity: ... }` in `hero.css` to dial intensity. |
 
 The sparkle PNG carries its own brand gradient (blue → purple → pink) and is
 **not** color-controlled by CSS. If you need a different sparkle color, swap
@@ -215,14 +318,18 @@ state between frames. That means:
 ```
 process-steps/
 ├── README.md             ← you are here
-├── index.html            ← minimal standalone demo
+├── index.html            ← standalone demo: hero → exit → animation → replay
+├── hero.css              ← landing hero block + exit animation (Path B only)
 ├── process-steps.css     ← animation styles (self-contained)
 ├── process-steps.js      ← animation engine + tiny playback driver
-├── tokens.css            ← four CSS custom properties the animation uses
+├── tokens.css            ← CSS custom properties for the animation AND hero
 ├── assets/
 │   └── sparkle-sf.png    ← the Salesforce brand sparkle glyph
 └── .gitignore
 ```
+
+`hero.css` is **only needed for Path B**. If you're integrating just the
+animation (Path A), you can ignore it entirely.
 
 ## Credits / origin
 
