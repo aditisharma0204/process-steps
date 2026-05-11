@@ -38,7 +38,7 @@
   // Step 2 and 3 keep the snappy 220ms enter so they don't feel like
   // full hero entrances every time.
   const PROCESS_STEPS_STEP1_ENTER    = 340;
-  const PROCESS_STEPS_STEP1_ENTER_TY = 40;
+  const PROCESS_STEPS_STEP1_ENTER_TY = 80;  // ~10% of viewport — matches the post-hero "text animates in from bottom up 10%" intent
 
   // Cross-step gap. After one step's `exit` ends, wait this many ms
   // of dead air before the next step's `enter` begins. Gives the eye

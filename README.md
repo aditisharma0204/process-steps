@@ -218,7 +218,7 @@ Change them in source — they're not exposed as runtime options.
 | `PROCESS_STEPS_SETTLE`            | `280`   | Sparkle→check crossfade + scale-pop duration (ms).                                                        | `200–400`      |
 | `PROCESS_STEPS_EXIT`              | `220`   | Per-row exit duration (ms).                                                                               | `160–360`      |
 | `PROCESS_STEPS_STEP1_ENTER`       | `340`   | Step 1's entrance is intentionally longer than steps 2–3 (more deliberate hand-off from a hero exit).     | `220–500`      |
-| `PROCESS_STEPS_STEP1_ENTER_TY`    | `40`    | Step 1's enter translateY (px). Visibly slides up.                                                        | `20–60`        |
+| `PROCESS_STEPS_STEP1_ENTER_TY`    | `80`    | Step 1's enter translateY (px). ~10% of typical viewport height; makes the post-hero text entrance feel deliberate. | `40–120`       |
 | `PROCESS_STEPS_ENTER_TY`          | `14`    | Default enter translateY (px) for steps 2+.                                                               | `8–24`         |
 | `PROCESS_STEPS_EXIT_TY`           | `14`    | Exit translateY (px).                                                                                     | `8–24`         |
 | `PROCESS_STEPS_ENTER_SCALE_FROM`  | `0.985` | Starting scale of the row at the moment of enter.                                                         | `0.95–1.00`    |
